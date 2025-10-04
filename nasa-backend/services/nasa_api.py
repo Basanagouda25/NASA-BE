@@ -1,12 +1,18 @@
-import random
-from models.schemas import WeatherRequest, WeatherResponse
+import requests
 
-def fetch_weather_data(request: WeatherRequest) -> WeatherResponse:
-    simulated_value = round(random.uniform(10, 40), 2)
-    return WeatherResponse(
-        location=request.location,
-        date=request.date,
-        variable=request.variable,
-        value=simulated_value,
-        unit="°C" if request.variable == "temperature" else "units"
-    )
+BASE_URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
+
+def fetch_nasa_data(lat: float, lon: float, start: str, end: str, variables: str):
+    params = {
+        "parameters": variables,  # e.g., "T2M,PRECTOTCORR"
+        "community": "AG",        # AG = agriculture, CL = climatology
+        "longitude": lon,
+        "latitude": lat,
+        "start": start.replace("-", ""),  # YYYYMMDD
+        "end": end.replace("-", ""),
+        "format": "JSON"
+    }
+
+    response = requests.get(BASE_URL, params=params)
+    response.raise_for_status()
+    return response.json()

@@ -1,13 +1,9 @@
 from fastapi import APIRouter
-from models.schemas import WeatherRequest, WeatherResponse
-from services.nasa_api import fetch_weather_data
+from services.nasa_api import fetch_nasa_data
 
 router = APIRouter()
 
-@router.get("/hello")
-def say_hello():
-    return {"message": "Hello from the Data Router 🌍"}
-
-@router.post("/weather", response_model=WeatherResponse)
-def get_weather(request: WeatherRequest):
-    return fetch_weather_data(request)
+@router.get("/data")
+def get_weather_data(lat: float, lon: float, start: str, end: str, variables: str):
+    data = fetch_nasa_data(lat, lon, start, end, variables)
+    return data
